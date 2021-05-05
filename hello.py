@@ -27,22 +27,3 @@ run(app, host='localhost', port=8080, debug=True)
 def getTest():
     return {'test': "Hello World"}
 
-'''
-    If you essentially copied the structure of A4 in COMP 521, you have
-    to modify your ORM layer's Bottle routes.
-
-    For example, originially I had this:
-    
-        @app.post('/login') 
-            def login():
-                < the code you made for login > 
-                return json.dumps(some login thing)
-            
-    But I had to change it to this:
-    
-        @app.route('/login', method=['OPTIONS', 'POST']) 
-            def login():
-                < the code you made for login >   
-                return json.dumps(some login thing)
-
-'''
