@@ -5,6 +5,7 @@ from user import User
 from game import Game
 import json
 
+# Setup Flask
 app = Flask(__name__)
 CORS(app)
 
