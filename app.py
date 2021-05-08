@@ -11,7 +11,7 @@ CORS(app)
 # Setup the database
 create_connection('chess.db')
 # Setup the database tables
-resetDB()
+setupDB()
 
 @app.route("/")
 def hello():
@@ -32,7 +32,7 @@ def sign_up():
         abort(400)
         return str(error)
     row = User.findUser(username)
-    return {'username': row['username'], 'salt': row['salt'], 'password': row['password']}
+    return {'username': row['username']}
 
 @app.route("/login", methods = ['GET','POST'])
 def login():

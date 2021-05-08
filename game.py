@@ -28,6 +28,7 @@ class Game:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM PracticeGame WHERE user = ?", (user,))
             return [{
+                'id': row['id'],
                 'user': row['user'],
                 'color': row['color'],
                 'date': row['date'],
