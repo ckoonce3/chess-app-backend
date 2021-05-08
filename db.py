@@ -32,6 +32,8 @@ def setupDB():
             CREATE TABLE IF NOT EXISTS PracticeGame (
                 id INTEGER PRIMARY KEY,
                 user TEXT,
+                color TEXT,
+                date DATE,
                 log TEXT,
                 FOREIGN KEY(user) REFERENCES User(username)
         )''')

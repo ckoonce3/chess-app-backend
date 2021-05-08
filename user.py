@@ -17,13 +17,13 @@ class User:
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO User (username, salt, password, loggedIn) VALUES (?, ?, ?, ?)", 
                     (username,salt,h,0))
+                conn.commit()
                 print('success')
         else:
             raise Exception('Username already exists')
 
     @staticmethod
-    def logIn(username, password, ip):
-        print(username,password,ip)
+    def logIn(username, password):
         # Retrieve the row corresponding to the username
         with connect() as conn:
             cursor = conn.cursor()
@@ -36,11 +36,9 @@ class User:
             h = hashlib.md5((password+row['salt']).encode()).hexdigest()
             if h != row['password']:
                 raise Exception('Incorrect password')
-            # Make sure that the user is not already logged in
-            if row['loggedIn'] == 1:
-                raise Exception('User is already logged in')
             # Set the loggedin and ip variables of the user
-            cursor.execute("UPDATE User SET loggedIn = 1, ip = ? WHERE username = ?", (ip,username))           
+            cursor.execute("UPDATE User SET loggedIn = 1 WHERE username = ?", (username,))
+            conn.commit()          
 
 
     @staticmethod
@@ -50,6 +48,13 @@ class User:
             cursor.execute("SELECT * FROM User WHERE username = ?", (username,))
             row = cursor.fetchone()
             return row
+
+    @staticmethod
+    def logOut(username):
+        with connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE User SET loggedIn = 0 WHERE username = ?", (username,))
+            conn.commit()
 
 
 def getSalt(length):

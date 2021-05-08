@@ -2,6 +2,8 @@ from flask import Flask, request, abort
 from flask_cors import CORS
 from db import create_connection, setupDB, resetDB, connect
 from user import User
+from game import Game
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -38,12 +40,52 @@ def login():
         body = request.get_json(force=True)
         username = body['username']
         password = body['password']
-        ip = request.headers['Origin']
         try:
-            User.logIn(username, password, ip)
+            User.logIn(username, password)
         except Exception as error:
             abort(400)
             return str(error)
         row = User.findUser(username)
-        return {'loggedIn': row['loggedIn'], 'ip': row['ip']}
+        return {'loggedIn': row['loggedIn']}
 
+@app.route("/logout")
+def logout():
+    username = request.args.get('username')
+    row = User.findUser(username)
+    if row is None:
+        abort(404)
+        return 'Username not found'
+    if row['loggedIn'] == 0:
+        abort(400)
+        return 'User is not logged in'
+    User.logOut(username)
+    row = User.findUser(username)
+    return {'loggedIn': row['loggedIn']}
+
+@app.route("/save", methods = ['POST'])
+def save():
+    body = request.get_json(force=True)
+    username = body['username']
+    row = User.findUser(username)
+    if row['loggedIn'] == 0:
+        abort(400)
+        return 'User is not logged in'
+    color = body['color']
+    date = body['date']
+    log = body['log']
+    row = Game.saveGame(username,color,date,log)
+    return {
+        'id': row['id'],
+        'user': row['user'], 
+        'color': row['color'],
+        'date': row['date'],
+        'log': row['log']}
+
+@app.route("/load")
+def load():
+    user = request.args.get('username')
+    row = User.findUser(user)
+    if row is None:
+        abort(404)
+        return {'error': 'Username not found'}
+    return json.dumps(Game.loadGames(user))
